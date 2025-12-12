@@ -1,6 +1,7 @@
 /**
  * Deep Research Agent - Main Orchestrator
  * Coordinates the iterative research process using Gemini AI
+ * Enhanced with RuVector for vector memory, knowledge graphs, and self-learning
  */
 
 import { GeminiClient } from './gemini-client.js';
@@ -9,6 +10,7 @@ import { ContentProcessor } from './content-processor.js';
 import { Reflector } from './reflector.js';
 import { ReportGenerator } from './report-generator.js';
 import { config } from './config.js';
+import { RuVectorIntegration } from './ruvector-integration.js';
 
 /**
  * Research State - tracks the current state of research
@@ -67,6 +69,7 @@ class ResearchState {
 /**
  * Deep Research Agent Class
  * Main orchestrator for iterative research
+ * Enhanced with RuVector for persistent memory and self-learning
  */
 export class DeepResearchAgent {
   constructor(options = {}) {
@@ -76,12 +79,26 @@ export class DeepResearchAgent {
     this.reflector = new Reflector(this.client);
     this.reportGenerator = new ReportGenerator(this.client);
 
+    // RuVector integration for enhanced capabilities
+    this.ruvector = new RuVectorIntegration();
+    this.useRuvector = options.useRuvector !== false;
+
     this.depth = options.depth || config.research.depth;
     this.breadth = options.breadth || config.research.breadth;
     this.maxIterations = options.maxIterations || config.research.maxIterations;
 
     this.onProgress = options.onProgress || (() => {});
     this.onIteration = options.onIteration || (() => {});
+  }
+
+  /**
+   * Initialize RuVector components
+   * @returns {Promise<void>}
+   */
+  async initializeRuvector() {
+    if (this.useRuvector && !this.ruvector.isInitialized) {
+      await this.ruvector.initialize();
+    }
   }
 
   /**
@@ -97,6 +114,42 @@ export class DeepResearchAgent {
     this.onProgress({ type: 'start', topic, state: state.toJSON() });
 
     try {
+      // Initialize RuVector for memory and learning
+      await this.initializeRuvector();
+
+      // Use smart routing to determine optimal parameters
+      if (this.useRuvector) {
+        const routing = this.ruvector.router.route(topic);
+        this.onProgress({ type: 'routing', routing, state: state.toJSON() });
+
+        // Apply routing recommendations if not overridden
+        if (!options.depth) this.depth = routing.recommendedDepth;
+        if (!options.breadth) this.breadth = routing.recommendedBreadth;
+
+        // Add topic to knowledge graph
+        state.topicNodeId = this.ruvector.graph.addTopic(topic, {
+          depth: this.depth,
+          breadth: this.breadth,
+        });
+
+        // Check for prior research on similar topics
+        const priorKnowledge = await this.ruvector.memory.search(topic, 5);
+        if (priorKnowledge.length > 0) {
+          this.onProgress({
+            type: 'prior_knowledge',
+            count: priorKnowledge.length,
+            state: state.toJSON(),
+          });
+
+          // Add prior knowledge as initial learnings
+          for (const knowledge of priorKnowledge) {
+            if (knowledge.score > 0.7) {
+              state.addLearning(`[Prior Research] ${knowledge.content}`, null);
+            }
+          }
+        }
+      }
+
       // Phase 1: Initial query generation
       await this.executeQueryGeneration(state, options);
 
@@ -109,6 +162,11 @@ export class DeepResearchAgent {
 
       const report = await this.generateFinalReport(state);
 
+      // Store learnings in RuVector memory for future research
+      if (this.useRuvector) {
+        await this.storeLearningsInMemory(state);
+      }
+
       state.status = 'complete';
       this.onProgress({ type: 'complete', state: state.toJSON(), report });
 
@@ -117,6 +175,37 @@ export class DeepResearchAgent {
       state.status = 'error';
       this.onProgress({ type: 'error', error: error.message, state: state.toJSON() });
       throw error;
+    }
+  }
+
+  /**
+   * Store research learnings in RuVector memory
+   * @param {ResearchState} state - Final research state
+   */
+  async storeLearningsInMemory(state) {
+    const findings = state.learnings.map((learning) => ({
+      content: learning.insight,
+      metadata: {
+        topic: state.topic,
+        sourceUrl: learning.sourceUrl,
+        iteration: learning.iteration,
+        type: 'research_finding',
+      },
+    }));
+
+    await this.ruvector.memory.storeBatch(findings);
+
+    // Update knowledge graph
+    for (const learning of state.learnings) {
+      const sourceId = learning.sourceUrl
+        ? this.ruvector.graph.addSource(learning.sourceUrl)
+        : null;
+
+      this.ruvector.graph.addFinding(
+        learning.insight,
+        state.topicNodeId,
+        sourceId
+      );
     }
   }
 
@@ -358,6 +447,65 @@ Keep it concise (2-3 paragraphs).`
       summary: result.text,
       sources: result.sources,
     };
+  }
+
+  /**
+   * Provide feedback on research results for self-learning
+   * @param {string} topic - Research topic
+   * @param {object} result - Research result
+   * @param {number} rating - User rating (1-5)
+   * @param {string} correction - Optional correction or feedback
+   */
+  provideFeedback(topic, result, rating, correction = null) {
+    if (this.useRuvector) {
+      this.ruvector.learner.recordFeedback(topic, result, rating, correction);
+    }
+  }
+
+  /**
+   * Find related research topics from the knowledge graph
+   * @param {string} topic - Topic to find relations for
+   * @returns {Promise<Array<object>>} Related topics
+   */
+  async findRelatedTopics(topic) {
+    if (!this.useRuvector) return [];
+
+    await this.initializeRuvector();
+    const topicId = `topic:${topic.toLowerCase().replace(/\s+/g, '_')}`;
+    return this.ruvector.graph.findRelatedTopics(topicId, 2);
+  }
+
+  /**
+   * Search prior research from memory
+   * @param {string} query - Search query
+   * @param {number} k - Number of results
+   * @returns {Promise<Array<object>>} Prior research findings
+   */
+  async searchPriorResearch(query, k = 10) {
+    if (!this.useRuvector) return [];
+
+    await this.initializeRuvector();
+    return this.ruvector.memory.search(query, k);
+  }
+
+  /**
+   * Get statistics about research history and learning
+   * @returns {object} Statistics
+   */
+  getStats() {
+    if (!this.useRuvector || !this.ruvector.isInitialized) {
+      return { ruvector: 'not initialized' };
+    }
+    return this.ruvector.getStats();
+  }
+
+  /**
+   * Export knowledge graph data
+   * @returns {object} Graph data
+   */
+  exportKnowledgeGraph() {
+    if (!this.useRuvector) return { nodes: [], edges: [] };
+    return this.ruvector.graph.export();
   }
 }
 

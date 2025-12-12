@@ -1,6 +1,7 @@
 /**
  * Gemini Deep Research Agent
  * Main entry point for programmatic usage
+ * Enhanced with RuVector for vector memory and self-learning
  *
  * @module gemini-deep-research-agent
  */
@@ -18,6 +19,16 @@ export {
   createResearchAgent,
   researchAgent,
 } from './research-agent.js';
+
+// RuVector integration for enhanced capabilities
+export {
+  RuVectorIntegration,
+  ResearchMemory,
+  ResearchKnowledgeGraph,
+  ResearchLearner,
+  QueryRouter,
+  ruvectorIntegration,
+} from './ruvector-integration.js';
 
 // Configuration
 export { config, validateConfig, getConfigSummary } from './config.js';

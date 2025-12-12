@@ -12,6 +12,13 @@ A powerful AI-powered deep research agent built with Google Gemini API. This age
 - **Multiple Output Formats**: Markdown, JSON, or HTML reports
 - **CLI & Programmatic API**: Use from command line or integrate into your applications
 
+### RuVector Integration (Enhanced)
+
+- **Vector Memory**: Stores research findings as embeddings for semantic retrieval across sessions
+- **Knowledge Graph**: Connects topics, sources, and findings using graph relationships
+- **Self-Learning**: Improves research quality through user feedback and pattern learning
+- **Smart Query Routing**: Automatically determines optimal depth/breadth based on query complexity
+
 ## Architecture
 
 ```
@@ -149,6 +156,80 @@ const insights = await processor.processSearchResult(searchResult, 'climate chan
 console.log(insights);
 ```
 
+### Using RuVector Features
+
+```javascript
+import { createResearchAgent, RuVectorIntegration } from 'gemini-deep-research-agent';
+
+// Create agent with RuVector enabled (default)
+const agent = createResearchAgent({
+  useRuvector: true,  // Enable vector memory and knowledge graph
+});
+
+// Research a topic - findings are automatically stored
+const report = await agent.research('Quantum computing applications');
+
+// Search prior research (from previous sessions)
+const priorFindings = await agent.searchPriorResearch('quantum', 10);
+console.log('Found prior research:', priorFindings.length);
+
+// Find related topics from knowledge graph
+const related = await agent.findRelatedTopics('quantum computing');
+console.log('Related topics:', related);
+
+// Provide feedback for self-learning
+agent.provideFeedback('quantum computing', report, 5, 'Excellent coverage');
+
+// Get learning statistics
+const stats = agent.getStats();
+console.log('Memory stats:', stats.memory);
+console.log('Graph stats:', stats.graph);
+console.log('Learning stats:', stats.learner);
+
+// Export knowledge graph for visualization
+const graphData = agent.exportKnowledgeGraph();
+console.log('Nodes:', graphData.nodes.length);
+console.log('Edges:', graphData.edges.length);
+```
+
+### Using RuVector Components Directly
+
+```javascript
+import {
+  ResearchMemory,
+  ResearchKnowledgeGraph,
+  ResearchLearner,
+  QueryRouter,
+} from 'gemini-deep-research-agent';
+
+// Vector memory for semantic storage
+const memory = new ResearchMemory();
+await memory.initialize();
+
+// Store findings
+await memory.store('AI models are improving rapidly', {
+  topic: 'artificial intelligence',
+  type: 'finding',
+});
+
+// Search semantically
+const results = await memory.search('machine learning progress', 5);
+console.log(results);
+
+// Knowledge graph for connections
+const graph = new ResearchKnowledgeGraph();
+const topicId = graph.addTopic('Machine Learning');
+const sourceId = graph.addSource('https://example.com/ml-article', 'ML Article');
+graph.addFinding('Deep learning dominates NLP', topicId, sourceId);
+
+// Smart query routing
+const router = new QueryRouter();
+const routing = router.route('Explain the comprehensive impact of AI on healthcare');
+console.log('Complexity:', routing.complexity);  // 'complex'
+console.log('Recommended depth:', routing.recommendedDepth);  // 5
+console.log('Estimated time:', routing.estimatedTime);  // '3-10 minutes'
+```
+
 ## Configuration
 
 ### Environment Variables
@@ -198,18 +279,19 @@ Generated reports include:
 ```
 gemini-deep-research-agent/
 ├── src/
-│   ├── index.js           # Main entry point
-│   ├── cli.js             # CLI interface
-│   ├── config.js          # Configuration management
-│   ├── gemini-client.js   # Gemini API wrapper
-│   ├── query-generator.js # Search query generation
-│   ├── content-processor.js # Content analysis
-│   ├── reflector.js       # Gap analysis & reflection
-│   ├── report-generator.js # Report synthesis
-│   ├── research-agent.js  # Main orchestrator
-│   └── prompts.js         # System prompts
-├── reports/               # Generated reports
-├── .env.example           # Environment template
+│   ├── index.js              # Main entry point
+│   ├── cli.js                # CLI interface
+│   ├── config.js             # Configuration management
+│   ├── gemini-client.js      # Gemini API wrapper
+│   ├── query-generator.js    # Search query generation
+│   ├── content-processor.js  # Content analysis
+│   ├── reflector.js          # Gap analysis & reflection
+│   ├── report-generator.js   # Report synthesis
+│   ├── research-agent.js     # Main orchestrator
+│   ├── ruvector-integration.js # RuVector memory & learning
+│   └── prompts.js            # System prompts
+├── reports/                  # Generated reports
+├── .env.example              # Environment template
 ├── package.json
 └── README.md
 ```
