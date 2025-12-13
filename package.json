@@ -32,10 +32,11 @@
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
-    "node-fetch": "^3.3.2",
-    "ora": "^8.1.0",
+    "dspy.ts": "^2.1.1",
+    "lru-cache": "^11.0.0",
     "marked": "^14.1.0",
-    "lru-cache": "^11.0.0"
+    "node-fetch": "^3.3.2",
+    "ora": "^8.1.0"
   },
   "optionalDependencies": {
     "@ruvector/ruvllm": "^1.0.0",

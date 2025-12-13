@@ -12,6 +12,14 @@ A powerful AI-powered deep research agent built with Google Gemini API. This age
 - **Multiple Output Formats**: Markdown, JSON, or HTML reports
 - **CLI & Programmatic API**: Use from command line or integrate into your applications
 
+### Simple Deep Research (NEW!)
+
+- **Gemini Deep Research API**: Direct integration with Gemini's Interactions API for deep research
+- **DSPy.ts Optimization**: Uses DSPy.ts for automatic prompt optimization and output formatting
+- **Streaming Support**: Real-time progress updates via server-sent events
+- **Easy to Use**: Simplified API for quick research tasks
+- **Self-Optimizing**: Learns from queries to improve search strategies
+
 ### RuVector Integration (Enhanced)
 
 - **Vector Memory**: Stores research findings as embeddings for semantic retrieval across sessions
@@ -52,13 +60,15 @@ A powerful AI-powered deep research agent built with Google Gemini API. This age
 git clone https://github.com/ruvnet/gemini-deep-research-agent.git
 cd gemini-deep-research-agent
 
-# Install dependencies
-npm install
+# Install dependencies (includes DSPy.ts for prompt optimization)
+npm install --legacy-peer-deps
 
 # Set up environment variables
 cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
 ```
+
+**Note**: The `--legacy-peer-deps` flag is required for DSPy.ts installation compatibility.
 
 ## Getting a Gemini API Key
 
@@ -68,6 +78,70 @@ cp .env.example .env
 4. Copy the key and add it to your `.env` file
 
 ## Usage
+
+### Simple Deep Research Usage (NEW!)
+
+The Simple Deep Research API provides a streamlined way to use Gemini's Deep Research with DSPy.ts optimization:
+
+```javascript
+import { SimpleDeepResearch, quickResearch } from './src/simple-deep-research.js';
+
+// Quick one-liner research
+const result = await quickResearch('What are the latest developments in quantum computing?', {
+  useOptimization: true,  // Enable DSPy.ts prompt optimization
+  outputStyle: 'comprehensive',  // 'comprehensive', 'concise', 'detailed', 'summary'
+});
+
+console.log(result.content);           // Research report
+console.log(result.key_insights);      // Extracted insights
+console.log(result.citations);         // Source citations
+
+// Advanced usage with custom options
+const client = new SimpleDeepResearch();
+
+const result = await client.research('Future of renewable energy', {
+  useOptimization: true,
+  outputStyle: 'detailed',
+  pollInterval: 3000,        // Check status every 3 seconds
+  maxAttempts: 100,          // Max polling attempts
+  onProgress: (status) => {  // Progress callback
+    console.log('Status:', status);
+  },
+});
+
+// Optimize queries with DSPy
+await client.initializeDSPy();
+const optimized = await client.optimizeQuery(
+  'machine learning',
+  'Focus on recent advances and practical applications'
+);
+console.log('Optimized query:', optimized.optimized_query);
+console.log('Search strategy:', optimized.search_strategy);
+
+// Stream research results in real-time
+const interaction = await client.createResearch('blockchain technology', {
+  stream: true,
+  useOptimization: true,
+  onProgress: (update) => console.log('Update:', update),
+});
+
+// Poll for completion
+const finalResult = await client.pollUntilComplete(interaction.id);
+```
+
+#### Running Examples
+
+```bash
+# Run all simple research examples
+node examples/simple-research-example.js
+
+# Run specific example
+node examples/simple-research-example.js 1  # Basic research
+node examples/simple-research-example.js 2  # Quick research
+node examples/simple-research-example.js 3  # Streaming research
+node examples/simple-research-example.js 4  # Custom DSPy optimization
+node examples/simple-research-example.js 5  # Batch research
+```
 
 ### CLI Usage
 
@@ -283,6 +357,7 @@ gemini-deep-research-agent/
 │   ├── cli.js                # CLI interface
 │   ├── config.js             # Configuration management
 │   ├── gemini-client.js      # Gemini API wrapper
+│   ├── simple-deep-research.js # Simple Deep Research with DSPy (NEW!)
 │   ├── query-generator.js    # Search query generation
 │   ├── content-processor.js  # Content analysis
 │   ├── reflector.js          # Gap analysis & reflection
@@ -290,6 +365,8 @@ gemini-deep-research-agent/
 │   ├── research-agent.js     # Main orchestrator
 │   ├── ruvector-integration.js # RuVector memory & learning
 │   └── prompts.js            # System prompts
+├── examples/
+│   └── simple-research-example.js # Simple Deep Research examples (NEW!)
 ├── reports/                  # Generated reports
 ├── .env.example              # Environment template
 ├── package.json
@@ -332,6 +409,13 @@ MIT License - see LICENSE file for details
 
 ## Related Projects
 
+- [ruvnet/dspy.ts](https://github.com/ruvnet/dspy.ts) - DSPy.ts framework for prompt optimization
 - [google-gemini/gemini-fullstack-langgraph-quickstart](https://github.com/google-gemini/gemini-fullstack-langgraph-quickstart)
 - [ruvnet/ruvector](https://github.com/ruvnet/ruvector)
 - [ruvnet/agentic-flow](https://github.com/ruvnet/agentic-flow)
+
+## Additional Resources
+
+- [Gemini Deep Research API Documentation](https://ai.google.dev/gemini-api/docs/deep-research)
+- [DSPy.ts NPM Package](https://www.npmjs.com/package/dspy.ts)
+- [Google AI Studio](https://aistudio.google.com/)
