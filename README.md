@@ -2,7 +2,37 @@
 
 A powerful AI-powered deep research agent built with Google Gemini API. This agent conducts iterative, comprehensive research on any topic by generating search queries, analyzing results, identifying knowledge gaps, and synthesizing findings into well-structured reports with citations.
 
+## 🚀 New: SPARC PRD Generation
+
+**Transform deep research into production-ready Product Requirements Documents!**
+
+The agent now includes advanced capabilities for generating comprehensive PRDs using the **SPARC methodology** (Specification, Pseudocode, Architecture, Refinement, Completion) with **London School TDD** practices.
+
+**Key Features:**
+- 🔬 **Deep Research → PRD Pipeline**: Automated end-to-end workflow
+- 🤖 **Claude Agent SDK Integration**: Multi-model orchestration patterns
+- 🎯 **DSPy.ts Prompt Optimization**: Automatically improve prompt quality
+- 📋 **SPARC Methodology**: Complete 5-phase PRD generation
+- ✅ **London School TDD**: Test-driven development planning
+
+**Quick Start:**
+```bash
+# Generate a PRD from a topic
+node agents/prd-agent.js "AI-Powered Code Review Tool" --depth 5 --verbose
+
+# Or use programmatically
+import { PRDAgent } from './agents/prd-agent.js';
+const agent = new PRDAgent();
+const result = await agent.generatePRD('Your Project Topic');
+```
+
+See [Agents README](./agents/README.md) and [Examples](./examples/README.md) for details.
+
+---
+
 ## Features
+
+### Core Research Features
 
 - **Iterative Research Loop**: Automatically generates queries, searches, analyzes, and refines until comprehensive coverage
 - **Search Grounding**: Uses Gemini's built-in search grounding for real-time web research
@@ -18,6 +48,13 @@ A powerful AI-powered deep research agent built with Google Gemini API. This age
 - **Knowledge Graph**: Connects topics, sources, and findings using graph relationships
 - **Self-Learning**: Improves research quality through user feedback and pattern learning
 - **Smart Query Routing**: Automatically determines optimal depth/breadth based on query complexity
+
+### Advanced Agent System (NEW)
+
+- **Claude-Gemini Hybrid Agent**: Multi-model orchestration for enhanced research workflows
+- **DSPy.ts Optimizer**: Automatic prompt improvement using DSPy-inspired techniques
+- **SPARC PRD Generator**: Complete PRD generation following industry best practices
+- **Complete PRD Agent**: End-to-end pipeline from research to production-ready documentation
 
 ## Architecture
 
@@ -290,7 +327,18 @@ gemini-deep-research-agent/
 │   ├── research-agent.js     # Main orchestrator
 │   ├── ruvector-integration.js # RuVector memory & learning
 │   └── prompts.js            # System prompts
-├── reports/                  # Generated reports
+├── agents/                   # Advanced AI agents (NEW)
+│   ├── README.md             # Agent documentation
+│   ├── claude-agent-sdk.js   # Claude-Gemini hybrid agent
+│   ├── dspy-optimizer.js     # DSPy.ts prompt optimizer
+│   ├── sparc-generator.js    # SPARC PRD generator
+│   └── prd-agent.js          # Complete PRD generation agent
+├── examples/                 # Usage examples (NEW)
+│   ├── README.md             # Examples documentation
+│   ├── deep-research-example.js      # Research examples
+│   └── complete-workflow-example.js  # Full workflow examples
+├── prds/                     # Generated PRD documents (NEW)
+├── reports/                  # Generated research reports
 ├── .env.example              # Environment template
 ├── package.json
 └── README.md
@@ -316,9 +364,110 @@ gemini-deep-research-agent/
 - Rate limits apply based on your API tier
 - Results should be verified for critical applications
 
+## PRD Generation with SPARC Methodology
+
+### What is SPARC?
+
+SPARC is a comprehensive methodology for systematic software development:
+
+- **S**pecification: Requirements, user stories, acceptance criteria
+- **P**seudocode: High-level algorithm and logic design
+- **A**rchitecture: System design, components, infrastructure
+- **R**efinement: TDD implementation (London School)
+- **C**ompletion: Integration, documentation, deployment
+
+### PRD Generation Features
+
+#### 1. Complete PRD Agent
+
+Generate a full PRD from a single topic:
+
+```bash
+# CLI
+node agents/prd-agent.js "Your Project Idea"
+
+# Programmatic
+import { PRDAgent } from './agents/prd-agent.js';
+const agent = new PRDAgent();
+const result = await agent.generatePRD('AI Code Review Tool', {
+  techStack: {
+    backend: ['Node.js', 'PostgreSQL'],
+    frontend: ['React', 'TypeScript']
+  }
+});
+```
+
+**Output:** Complete PRD with all SPARC phases, research sources, and implementation guide.
+
+#### 2. DSPy.ts Prompt Optimization
+
+Automatically improve prompt quality:
+
+```javascript
+import { DSPyPromptOptimizer } from './agents/dspy-optimizer.js';
+const optimizer = new DSPyPromptOptimizer();
+
+// Optimize prompts for your domain
+const optimized = await optimizer.optimizeForSPARC({
+  domain: 'software development',
+  methodology: 'london-tdd'
+});
+```
+
+#### 3. Claude-Gemini Hybrid Agent
+
+Multi-model orchestration for complex workflows:
+
+```javascript
+import { ClaudeGeminiAgent } from './agents/claude-agent-sdk.js';
+const agent = new ClaudeGeminiAgent();
+
+// Execute custom workflows
+const result = await agent.executeWorkflow([
+  { type: 'research', topic: 'Market analysis' },
+  { type: 'generate', prompt: 'Synthesize findings' }
+]);
+```
+
+### Examples
+
+Comprehensive examples are available in the `examples/` directory:
+
+```bash
+# Deep research examples
+node examples/deep-research-example.js
+
+# Complete workflow examples
+node examples/complete-workflow-example.js
+```
+
+See [Examples README](./examples/README.md) for detailed documentation.
+
+### London School TDD Integration
+
+All PRDs include TDD implementation strategies using London School principles:
+
+- **Outside-In Development**: Start with high-level behavior
+- **Mock External Dependencies**: Test components in isolation
+- **Behavior Over State**: Test what objects do, not what they are
+- **Red-Green-Refactor**: Iterative development cycle
+
+Example PRD output includes:
+- Unit test structure and naming conventions
+- Mock/stub strategies
+- Integration test scenarios
+- Quality assurance gates
+- Test coverage targets
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
+
+Areas for contribution:
+- Additional optimization algorithms (MIPROv2, MIPROv3)
+- More TDD methodologies (Chicago School, etc.)
+- Custom PRD templates
+- Integration with other LLM providers
 
 ## License
 
@@ -328,6 +477,8 @@ MIT License - see LICENSE file for details
 
 - Built with [Google Gemini API](https://ai.google.dev/)
 - Inspired by [Google's Deep Research](https://blog.google/technology/developers/deep-research-agent-gemini-api/)
+- SPARC methodology by [ruvnet](https://github.com/ruvnet/claude-flow)
+- DSPy.ts integration inspired by [ruvnet/dspy.ts](https://github.com/ruvnet/dspy.ts)
 - Created by [ruvnet](https://github.com/ruvnet)
 
 ## Related Projects
